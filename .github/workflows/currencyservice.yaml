@@ -6,7 +6,7 @@ on:
       - main
       - develop
     paths:
-      - 'src/currencyservice/**'
+      - 'src/**'
       - '.github/workflows/currencyservice.yaml'
       - '.github/workflows/template.yaml'
   pull_request:
@@ -14,7 +14,7 @@ on:
       - main
       - develop
     paths:
-      - 'src/currencyservice/**'
+      - 'src/**'
       - '.github/workflows/currencyservice.yaml'
       - '.github/workflows/template.yaml'
 
@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   call-template:
-    uses: HipsterShopp/hipstershop-shared-workflows/.github/workflows/template.yaml
+    uses: HipsterShopp/hipstershop-shared-workflows/.github/workflows/template.yaml@main
     with:
       github_event_name: ${{ github.event_name }}
       service_name: currencyservice
