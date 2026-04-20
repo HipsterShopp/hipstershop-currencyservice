@@ -118,9 +118,7 @@ jobs:
     with:
       service_name: currencyservice
       service_path: src/
-      runtime: java
-      java-version: "21"
-      java-build-tool: "gradle"
+      runtime: node
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
