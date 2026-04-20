@@ -157,7 +157,33 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+# Create a GitHub Release after successful push to Docker Hub and Git Tagging
+  create-release:
+    needs: [push, generate-tag-and-build-image]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref_name == 'main' &&
+      needs.push.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.generate-tag-and-build-image.outputs.tag }}
+          name: Release ${{ needs.generate-tag-and-build-image.outputs.tag }}
+          body: |
+            ## Service: currencyservice
+            - **Version:** `${{ needs.generate-tag-and-build-image.outputs.tag }}`
+            - **Docker Image:** `hipstershop-currencyservice:${{ needs.generate-tag-and-build-image.outputs.tag }}`
+            
+            This release was automatically generated after a successful push to the main branch.
+          generate_release_notes: true
 
   # update helm values for dev
   update-helm-values-dev:
@@ -210,7 +236,7 @@ jobs:
       HELM_CHARTS_TOKEN: ${{ secrets.HELM_CHARTS_TOKEN }}
 
   notify:
-    needs: [sonar-and-snyk, generate-tag-and-build-image, push, update-helm-values-dev, update-helm-values-prod]
+    needs: [sonar-and-snyk, generate-tag-and-build-image, push, update-helm-values-dev, update-helm-values-prod, create-release]
     if: always()
     uses: HipsterShopp/hipstershop-shared-workflows/.github/workflows/notify.yaml@feature/loose-coupling
     with:
